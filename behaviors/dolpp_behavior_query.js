@@ -1,0 +1,374 @@
+// $Id$
+
+/**
+ * @file
+ * Query Behavior
+ */
+
+/*
+ * OpenLayers Query Control class
+ */
+Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
+
+  defaultHandlerOptions: {
+    'single': true,
+    'double': false,
+    'pixelTolerance': 0,
+    'stopSingle': false,
+    'stopDouble': false
+  },
+
+  /**
+   * Constructor: <Drupal.behaviors.QueryControl>
+   *
+   * Parameters:
+   * @options - {Object}
+   * In addition to common Control options, this class also accepts:
+   *  'radius'           Query radius (for vector layers)
+   *  'timeout'          Timeout for WMS GetFeatureInfo request, milliseconds
+   *  'qlayer_ids'       Identifying values for layers to query
+   *  'qlayer_id_field'  Name of the field containing layer's identifier
+   */
+  initialize: function(options) {
+
+    this.handlerOptions = OpenLayers.Util.extend(
+      {}, this.defaultHandlerOptions
+    );
+
+    OpenLayers.Control.prototype.initialize.apply(this, arguments); 
+
+    //console.log("handlerOptions: "); console.dir(this.handlerOptions);
+    this.handler = new OpenLayers.Handler.Click(
+      this, {
+        'click': this.trigger
+      }, this.handlerOptions
+    );
+
+  }, 
+
+  /**
+   * Method: getCandidateLayers
+   * Internal method for lazy candidate layers extraction
+   *
+   * Returns:
+   * {Array} list of layer references found on map with given id
+   */
+  getCandidateLayers: function() {
+    if ( ! this.candidateLayers ) {
+      this.candidateLayers = [];
+      if ( this.qlayers.length ) {
+        for (var i=0, len=this.qlayers.length; i<len; ++i) {
+          var layer_id = this.qlayers[i];
+          var selectedLayer = this.map.getLayersBy(this.qlayers_id_field,
+                                                   layer_id);
+          if (typeof selectedLayer[0] != 'undefined') {
+            var layer = selectedLayer[0];
+            // TODO: drop unqueriable WMS from candidates ?
+            this.candidateLayers.push(layer);
+          }
+        }
+      } else {
+        // Candidate layers are vector layers and WMS layers
+        // marked as queryable
+        for (var i=0, len=this.map.layers.length; i<len; ++i) {
+          var layer = this.map.layers[i];
+          if ( layer.CLASS_NAME == 'OpenLayers.Layer.Vector' ) {
+            this.candidateLayers.push(layer);
+          }
+          else if ( layer.CLASS_NAME == 'OpenLayers.Layer.WMS' ) {
+            if ( layer.queryable == 1 ) {
+              this.candidateLayers.push(layer);
+            } //else console.log("WMS layer "+layer.name+" is not queryable");
+          }
+        }
+      }
+    }
+
+    //console.log("Candidate layers:"); console.dir(this.candidateLayers);
+
+    return this.candidateLayers;
+  },
+
+  /* private
+   *
+   * Compute per-query informations 
+   * - layers to query (only visible ones from the candidate list)
+   * - tolerance in geographical units (depends on scale)
+   * - queryPoint in geographical units (depends on query point)
+   */
+  prepareQuery: function(evt) {
+
+    // TODO: cancel anything related to previous query
+    //       if any
+
+    var px1 = evt.xy;
+    var px2 = evt.xy.add(this.radius, 0);
+
+    var lonlat1 = this.map.getLonLatFromPixel(px1);
+    var lonlat2 = this.map.getLonLatFromPixel(px2);
+
+    var queryPoint = new OpenLayers.Geometry.Point(lonlat1.lon, lonlat1.lat);
+    var distPoint = new OpenLayers.Geometry.Point(lonlat2.lon, lonlat2.lat);
+
+    this.tolerance = queryPoint.distanceTo(distPoint);
+    this.queryPoint = queryPoint;
+    this.queryPixel = this.map.getLonLatFromPixel(px1);
+    this.layerInfo = [];
+
+    // Find the actual layers to query, based on their visibility
+    this.queryLayers = [];
+    var candidateLayers = this.getCandidateLayers();
+    for (var i=0, len=candidateLayers.length; i<len; ++i) {
+      var layer = candidateLayers[i];
+
+      // Only query visible layers
+      if ( layer.getVisibility() ) {
+        var typ = layer.CLASS_NAME.split('.')[2];
+        var meth = 'query'+typ+'Layer';
+        if ( typeof this[meth] == 'function' ) {
+          this.queryLayers.push({'layer': layer, 'meth': meth});
+        }
+      }
+
+    }
+
+    // TODO: draw a circle representing the query area ?
+
+  },
+
+  /* Private: perform a clik on map... */
+  trigger: function(evt) {
+
+    if ( ! evt ) return;
+
+    this.prepareQuery(evt);
+
+    /* Query layers */
+    for (var i=0, len=this.queryLayers.length; i<len; ++i) {
+      var layer = this.queryLayers[i];
+      var meth = layer.meth;
+      this[meth](evt, layer);
+    }
+  },
+
+  addLayerInfo: function(querylayer, info) {
+
+    var layer = querylayer.layer;
+    this.layerInfo.push({'layer': layer, 'info': info});
+
+    if (this.layerInfo.length >= this.queryLayers.length) {
+      this.addPopup();
+    } 
+
+    // TODO: debug log when getting called past the expected number of times ?
+  },
+
+  addPopup: function() {
+
+    var content = [];
+
+    for (var i=0, len=this.layerInfo.length; i<len; ++i) {
+      var data = this.layerInfo[i];
+      if ( data.info != '') {
+        var info = [];
+        info.push('<div class="openlayers-query openlayers-query-layer">');
+        info.push('<div class="openlayers-query openlayers-query-layer-name">');
+        info.push('<strong>' + data.layer.name + '</strong>');
+        info.push('</div>');
+        info.push(data.info);
+        info.push('</div>');
+        content.push(info.join(''));
+      }
+    }
+
+    var html = content.join('<hr>');
+    if ( html == '' ) html = 'Nothing here';
+
+    var popup = new OpenLayers.Popup.FramedCloud(
+      'popup',
+      this.queryPixel,
+      null,
+      html,
+      null,
+      true,
+      function (e) {
+        this.map.removePopup(this.map.queryPopup);
+      }
+    );
+    if ( typeof this.map.queryPopup != 'undefined' ) {
+      this.map.removePopup(this.map.queryPopup);
+    }
+    this.map.queryPopup = popup;
+    this.map.addPopup(popup);
+  },
+
+  /* private
+   *
+   * Perform query against a WMS layer
+   *
+   * @param querylayer internal structure containing
+   *                   informations about the layer to query
+   */
+  queryWMSLayer: function(evt, querylayer) {
+
+    var layer = querylayer.layer;
+
+    // TODO: add request for possibly multiple-features
+    // TODO2: try to ask for a tolerance (but WMS spec don't mention that)
+    var url = layer.getFullRequestString({
+      REQUEST: "GetFeatureInfo",
+      EXCEPTIONS: "application/vnd.ogc.se_xml",
+      BBOX: layer.map.getExtent().toBBOX(),
+      X: evt.xy.x,
+      Y: evt.xy.y,
+      INFO_FORMAT: 'text/html',
+      QUERY_LAYERS: layer.params.LAYERS,
+      WIDTH: layer.map.size.w,
+      HEIGHT: layer.map.size.h
+    });
+
+    var request = null
+    try {
+      request = OpenLayers.Request.GET({
+        url: url,
+        callback: function(req) {
+
+          /*  Remove timeout, if any */
+          if ( querylayer.timeout ) {
+            window.clearTimeout(querylayer.timeout);
+            delete querylayer.timeout;
+          }
+
+          // see http://docs.openlayers.org/library/request.html
+          var info = '';
+          if ( req.status == 200 ) {
+            // extract just the body content
+            var match = req.responseText.match(/<body[^>]*>([\s\S]*)<\/body>/);
+            if (match && !match[1].match(/^\s*$/)) {
+              info += match[1];
+            }
+          } else {
+            //info += req.status+" response from server";
+          }
+          this.addLayerInfo(querylayer, info);
+        },
+        scope: this
+        //, proxy: <proxy_here>, or defaults to OpenLayers.ProxyHost
+        //                       which can be set on a preset-basis
+      });
+
+      querylayer.request = request;
+      var timeoutHandler = function() {
+        if ( querylayer.request ) {
+          //console.log("Aborting request");
+          querylayer.request.abort();
+        }
+        this.addLayerInfo(querylayer, '-timeout-');
+      }
+
+
+      /*  Add timeout */
+      querylayer.timeout = window.setTimeout(
+        OpenLayers.Function.bind( timeoutHandler, this ),
+        this.timeout );
+
+    } catch (e) {
+
+      this.addLayerInfo(querylayer,
+        'Could not query layer "'+layer.name+'": ' + e + ' (need proxy?)');
+
+    }
+
+  },
+
+  /* private
+   *
+   * Perform query against a Vector layer
+   * requires 'this.queryPoint' and 'this.tolerance' being set,
+   * which are taken care of by 'this.prepareQuery'
+   *
+   * @param querylayer internal structure containing
+   *                   informations about the layer to query
+   */
+  queryVectorLayer: function(evt, querylayer) {
+    
+    var layer = querylayer.layer;
+    var info = [];
+
+    for(var i=0, len=layer.features.length; i<len; ++i)  {
+      var feature = layer.features[i];
+      var dist = this.queryPoint.distanceTo(feature.geometry);
+      if ( dist <= this.tolerance ) {
+        //info.push('Distant: '+dist);
+        info.push(Drupal.theme('openlayersFeatureInfo', feature));
+      }
+    }
+
+    this.addLayerInfo(querylayer, info.join(''));
+  }
+
+});
+
+/* 
+ * Thematic feature info formatter
+ */
+Drupal.theme.prototype.openlayersFeatureInfo = function(feature) {
+  var output = '';
+  if(feature.cluster)
+  {
+    var visited = []; // to keep track of already-visited items
+    for(var i=0, len=feature.cluster.length; i<len; ++i) {
+      var pf = feature.cluster[i]; // pseudo-feature
+      if ( typeof pf.drupalFID != 'undefined' ) {
+        var mapwide_id = feature.layer.drupalID + pf.drupalFID;
+        if (mapwide_id in visited) continue;
+        visited[mapwide_id] = true;
+      }
+      output += '<div class="openlayers-query openlayers-query-feature">' +
+        arguments.callee(pf) + '</div>';
+    }
+  }
+  else
+  {
+    output =
+      '<div class="openlayers-query openlayers-query-feature-name">' +
+      feature.attributes.name +
+      '</div>' +
+      '<div class="openlayers-query openlayers-query-feature-description">' +
+      feature.attributes.description +
+      '</div>';
+  }
+  return output;
+};
+
+/**
+ * Behavior for Query 
+ * TODO: move away of Drupal.openlayers namespace
+ */
+Drupal.behaviors.openlayers_behavior_query = function(context) {
+
+  var data = $(context).data('openlayers');
+  if (data && data.map.behaviors['openlayers_behavior_query']) {
+
+    var options = data.map.behaviors['openlayers_behavior_query'];
+
+    var qlayers = [];
+    for (var i in options.layers) {
+      var layer_id = options.layers[i];
+      if ( layer_id !== 0 ) qlayers.push(layer_id);
+    }
+
+    var queryControl = new Drupal.openlayers.QueryControl({
+      qlayers_id_field: 'drupalID',
+      qlayers: qlayers,
+      radius: parseInt(options.radius, 10),
+      timeout: parseInt(options.timeout, 10),
+      autoActivate: true
+    });
+
+    var map = data.openlayers;
+    map.addControl(queryControl);
+  }
+
+};
+

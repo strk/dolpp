@@ -1,0 +1,6 @@
+; $Id$
+core = "6.x"
+name = "OpenLayers Plus Plus"
+dependencies[] = "openlayers"
+description = "Further Additional tools and behaviors for OpenLayers"
+package = "OpenLayers"

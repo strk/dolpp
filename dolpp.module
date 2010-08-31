@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * Implementation of hook_openlayers_behaviors().
+ *
+ * This is a ctools plugins hook.
+ */
+function dolpp_openlayers_behaviors() {
+  return array(
+    'dolpp_behavior_query' => array(
+      'title' => t('OL++ Query'),
+      'description' => t('Adds info boxes on maps clicks.'),
+      'type' => 'layer',
+      'path' => drupal_get_path('module', 'dolpp') .'/behaviors',
+      'file' => 'dolpp_behavior_query.inc',
+      'behavior' => array(
+        'class' => 'dolpp_behavior_query',
+        'parent' => 'openlayers_behavior',
+      ),
+    ),
+    'dolpp_behavior_legend' => array(
+      'title' => t('OL++ Legend'),
+      'description' => t('Adds map legend.'),
+      'type' => 'layer',
+      'path' => drupal_get_path('module', 'dolpp') .'/behaviors',
+      'file' => 'dolpp_behavior_legend.inc',
+      'behavior' => array(
+        'class' => 'dolpp_behavior_legend',
+        'parent' => 'openlayers_behavior',
+      ),
+    ),
+  );
+}
