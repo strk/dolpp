@@ -7,6 +7,7 @@
 
 /*
  * OpenLayers Query Control class
+ * TODO: move out of Drupal.openlayers namespace
  */
 Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
 
@@ -345,12 +346,12 @@ Drupal.theme.prototype.openlayersFeatureInfo = function(feature) {
  * Behavior for Query 
  * TODO: move away of Drupal.openlayers namespace
  */
-Drupal.behaviors.openlayers_behavior_query = function(context) {
+Drupal.behaviors.dolpp_behavior_query = function(context) {
 
   var data = $(context).data('openlayers');
-  if (data && data.map.behaviors['openlayers_behavior_query']) {
+  if (data && data.map.behaviors['dolpp_behavior_query']) {
 
-    var options = data.map.behaviors['openlayers_behavior_query'];
+    var options = data.map.behaviors['dolpp_behavior_query'];
 
     var qlayers = [];
     for (var i in options.layers) {
