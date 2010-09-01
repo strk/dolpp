@@ -53,4 +53,11 @@ function dolpp_form_openlayers_ui_layers_form_alter(&$form, &$form_state) {
             '#default_value' => isset($olddata['params']['queryable']) ? $olddata['params']['queryable'] : FALSE,
         );
 
+	$form['layer']['data']['params']['hasLegend'] = array (
+            '#type' => 'checkbox',
+            '#title' => t('Has legend'),
+            '#description' => t('Check if this layer supports a legend.'),
+            '#default_value' => isset($olddata['params']['hasLegend']) ? $olddata['params']['hasLegend'] : FALSE,
+        );
+
 }
