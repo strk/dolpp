@@ -39,9 +39,6 @@ function dolpp_openlayers_behaviors() {
  */
 function dolpp_form_openlayers_ui_layers_form_alter(&$form, &$form_state) {
 
-echo "<pre>";
-//var_dump($form_id);
-
 	$layer_type = $form['layer']['data']['layer_type']['#value'];
 
 	// We'll only act upon WMS layers for now
@@ -56,8 +53,4 @@ echo "<pre>";
             '#default_value' => isset($olddata['params']['queryable']) ? $olddata['params']['queryable'] : FALSE,
         );
 
-
-//var_dump($form_state);
-//var_dump($form['#parameters'][2]);
-echo "</pre>";
 }
