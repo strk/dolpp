@@ -31,3 +31,33 @@ function dolpp_openlayers_behaviors() {
     ),
   );
 }
+
+/**
+ * Implementation of hook_form_alter().
+ *
+ * This is a ctools plugins hook.
+ */
+function dolpp_form_openlayers_ui_layers_form_alter(&$form, &$form_state) {
+
+echo "<pre>";
+//var_dump($form_id);
+
+	$layer_type = $form['layer']['data']['layer_type']['#value'];
+
+	// We'll only act upon WMS layers for now
+	if ( $layer_type != "openlayers_layer_type_wms" ) return;
+
+	$olddata = $form['#parameters'][2]->data;
+
+	$form['layer']['data']['params']['queryable'] = array (
+            '#type' => 'checkbox',
+            '#title' => t('Queryable'),
+            '#description' => t('Check if this layer supports GetFeatureInfo calls.'),
+            '#default_value' => isset($olddata['params']['queryable']) ? $olddata['params']['queryable'] : FALSE,
+        );
+
+
+//var_dump($form_state);
+//var_dump($form['#parameters'][2]);
+echo "</pre>";
+}
