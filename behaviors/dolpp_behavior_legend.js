@@ -21,8 +21,9 @@ Drupal.openlayers.LegendControl = OpenLayers.Class(OpenLayers.Control, {
   getCandidateLayers: function() {
 
     if ( ! this.candidateLayers ) {
-      if ( this.qlayers.length ) {
-        this.candidateLayers = [];
+      this.candidateLayers = [];
+
+      if ( this.qlayers.length ) { 
         for (var i=0, len=this.qlayers.length; i<len; ++i) {
           var layer_id = this.qlayers[i];
           var selectedLayer = this.map.getLayersBy(this.qlayers_id_field,
@@ -32,7 +33,15 @@ Drupal.openlayers.LegendControl = OpenLayers.Class(OpenLayers.Control, {
           }
         }
       } else {
-        this.candidateLayers = this.map.layers;
+        // Candidate layers are WMS layers marked as having a legend
+        for (var i=0, len=this.map.layers.length; i<len; ++i) {
+          var layer = this.map.layers[i];
+          if ( layer.CLASS_NAME == 'OpenLayers.Layer.WMS' ) {
+            if ( layer.hasLegend == 1 ) {
+              this.candidateLayers.push(layer);
+            } //else console.log("WMS layer "+layer.name+" does not have a legend");
+          }
+        }
       }
     }
 
@@ -41,57 +50,47 @@ Drupal.openlayers.LegendControl = OpenLayers.Class(OpenLayers.Control, {
     return this.candidateLayers;
   },
 
-  writeLayerLegend: function(layer, text)
+  updateLayerLegend: function(layer)
   {
+    // Create layer legend
     var divID = this.div.id + "-"+layer.drupalID;
-    var div = document.getElementById(divID);
-    if ( div ) div.innerHTML = layer.name + '<br>' + text;
+    //var div = document.getElementById(divID);
+    var div = document.createElement("div");
+    //OpenLayers.Element.addClass(this.legendDiv, "openlayers-legend"); 
+    OpenLayers.Element.addClass(this.legendDiv, "openlayers-legend-layer"); 
+    div.id = divID;
+
+    var url = layer.getFullRequestString({
+      REQUEST: "GetLegendGraphic",
+      EXCEPTIONS: "application/vnd.ogc.se_inimage",
+      FORMAT: 'image/png',
+      LAYER: layer.params.LAYERS,
+      WIDTH: layer.map.size.w,
+      HEIGHT: layer.map.size.h
+    });
+
+    div.innerHTML = layer.name + '<br><img src="' + url + '">';
+    this.legendDiv.appendChild(div);
   },
 
-  toggleLayerLegendVisibility: function(evt)
+  updateLegend: function(evt)
   {
-    var layer = evt.object;
-    if ( layer.getVisibility() ) {
-        var handler = OpenLayers.Function.bind(this.writeLayerLegend, this);
-        layer.enableLegend(handler);
-    } else {
-      var divID = this.div.id + "-"+layer.drupalID;
-      var div = document.getElementById(divID);
-      div.innerHTML = '';
-      if ( layer.disableLegend ) layer.disableLegend();
+    if ( evt && evt.type == 'changelayer' && evt.property != 'visibility' ) {
+      return; // we only care about visibility changes
     }
-  },
 
-  setupLayerLegend: function(layer)
-  {
-    if ( layer.enableLegend ) {
+    // TODO: only update the legend for evt.layer object!
 
-      // Create layer legend div
-      var divID = this.div.id + "-"+layer.drupalID;
-      var div = document.createElement("div");
-      OpenLayers.Element.addClass(this.legendDiv, "openlayers-legend-layer"); 
-      div.id = divID;
-      this.legendDiv.appendChild(div);
-
-      if ( layer.getVisibility() ) {
-        var handler = OpenLayers.Function.bind(this.writeLayerLegend, this);
-        layer.enableLegend(handler);
-      }
-
-      var visibilityToggler = OpenLayers.Function.bind(
-          this.toggleLayerLegendVisibility, this);
-      layer.events.register('visibilitychanged', layer, visibilityToggler);
-    }
-  },
-
-  setupLegend: function()
-  {
     this.legendDiv.innerHTML = '';
     //this.legendDiv.innerHTML += '- LEGEND -';
     var candidateLayers = this.getCandidateLayers();
     for (var i=0, len=candidateLayers.length; i<len; ++i) {
       var layer = candidateLayers[i];
-      this.setupLayerLegend(layer);
+
+      // Only show legend for visible layers
+      if ( layer.getVisibility() ) {
+        this.updateLayerLegend(layer);
+      }
     }
   },
 
@@ -108,7 +107,16 @@ Drupal.openlayers.LegendControl = OpenLayers.Class(OpenLayers.Control, {
     this.div.appendChild(this.legendDiv);
 
     // Build legend once at start
-    this.setupLegend();
+    this.updateLegend();
+
+    // Then update on changes..
+    var updateFunctor = OpenLayers.Function.bind(this.updateLegend, this);
+    this.map.events.on({
+      //'moveend': updateFunctor,
+      'addlayer': updateFunctor,
+      'removelayer': updateFunctor,
+      'changelayer': updateFunctor
+    });
 
     return OpenLayers.Control.prototype.activate.apply(
         this, arguments
