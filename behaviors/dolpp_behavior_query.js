@@ -248,8 +248,16 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
             if (match && !match[1].match(/^\s*$/)) {
               info += match[1];
             }
-          } else {
+          } else if ( req.status == 404 ) {
+            // Nothing here (this is expected for no query results)
+            // altought it'd be hard to tell apart from a bogus url..
             //info += req.status+" response from server";
+          } else if ( req.status == 0 ) {
+            // This seems to be a cross-origin issue
+            info += req.status+" response from server (need a proxy?)";
+          } else {
+            // Unexpected ... what else could it be ?
+            info += req.status+" response from server";
           }
           this.addLayerInfo(querylayer, info);
         },
