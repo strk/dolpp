@@ -77,7 +77,7 @@ Drupal.openlayers.LegendControl = OpenLayers.Class(OpenLayers.Control, {
           + '; color:'
           + style.strokeColor
           + '">'
-          + '<b>Vector layerb>'
+          + '<b>Vector layer</b>'
           + '</div>';
     return s;
   },
