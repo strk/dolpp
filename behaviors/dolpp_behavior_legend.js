@@ -142,10 +142,20 @@ Drupal.behaviors.dolpp_behavior_legend = function(context) {
       if ( layer_id !== 0 ) layer_ids.push(layer_id);
     }
 
+    if ( options.div ) {
+      var outdiv = $('#'+options.div)[0];
+      // if ( ! outdiv ) console.log ('unknown division id '+options.div);
+    }
+
+    if ( ! outdiv ) {
+      /* this will be outside of the map */
+      var outdiv = context.parentNode; 
+    }
+
     var legendControl = new Drupal.openlayers.LegendControl({
       qlayers_id_field: 'drupalID',
       qlayers: layer_ids,
-      div: context.parentNode, /* this will be outside of the map */
+      div: outdiv,
       autoActivate: true
     });
     var map = data.openlayers;

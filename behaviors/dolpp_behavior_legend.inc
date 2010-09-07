@@ -44,6 +44,13 @@ class dolpp_behavior_legend extends openlayers_behavior {
         '#default_value' => isset($defaults['layers']) ? 
           $defaults['layers'] : array(),
       ),
+      'div' => array(
+        '#title' => t('Div'),
+        '#type' => 'textfield',
+        '#description' => t('Select id of DIV element to show legend in.'),
+        '#default_value' => isset($defaults['div']) ? 
+          $defaults['div'] : '',
+      ),
     );
   }
 
