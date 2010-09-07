@@ -41,6 +41,9 @@ Drupal.openlayers.LegendControl = OpenLayers.Class(OpenLayers.Control, {
               this.candidateLayers.push(layer);
             } //else console.log("WMS layer "+layer.name+" does not have a legend");
           }
+          else if ( layer.CLASS_NAME == 'OpenLayers.Layer.Vector' ) {
+              this.candidateLayers.push(layer);
+          }
         }
       }
     }
@@ -49,6 +52,46 @@ Drupal.openlayers.LegendControl = OpenLayers.Class(OpenLayers.Control, {
 
     return this.candidateLayers;
   },
+
+  getWMSLayerLegend: function(layer)
+  {
+    var url = layer.getFullRequestString({
+      REQUEST: "GetLegendGraphic",
+      EXCEPTIONS: "application/vnd.ogc.se_inimage",
+      FORMAT: 'image/png',
+      LAYER: layer.params.LAYERS,
+      WIDTH: layer.map.size.w,
+      HEIGHT: layer.map.size.h
+    });
+
+    return '<img src="' + url + '">';
+  },
+
+  getVectorLayerLegend: function(layer)
+  {
+
+    var style = layer.styleMap.styles.default.defaultStyle;
+    //console.dir(style);
+    var s = '<div style="background-color:'
+          + style.fillColor
+          + '; color:'
+          + style.strokeColor
+          + '">'
+          + '<b>-----</b>'
+          + '</div>';
+    return s;
+  },
+
+  getLayerLegend: function(layer)
+  {
+    if ( layer.CLASS_NAME == 'OpenLayers.Layer.WMS' ) {
+      return this.getWMSLayerLegend(layer);
+    }
+    else if ( layer.CLASS_NAME == 'OpenLayers.Layer.Vector' ) {
+      return this.getVectorLayerLegend(layer);
+    }
+  },
+
 
   updateLayerLegend: function(layer)
   {
@@ -60,16 +103,7 @@ Drupal.openlayers.LegendControl = OpenLayers.Class(OpenLayers.Control, {
     OpenLayers.Element.addClass(this.legendDiv, "openlayers-legend-layer"); 
     div.id = divID;
 
-    var url = layer.getFullRequestString({
-      REQUEST: "GetLegendGraphic",
-      EXCEPTIONS: "application/vnd.ogc.se_inimage",
-      FORMAT: 'image/png',
-      LAYER: layer.params.LAYERS,
-      WIDTH: layer.map.size.w,
-      HEIGHT: layer.map.size.h
-    });
-
-    div.innerHTML = layer.name + '<br><img src="' + url + '">';
+    div.innerHTML = layer.name + '<br>' + this.getLayerLegend(layer);
     this.legendDiv.appendChild(div);
   },
 
