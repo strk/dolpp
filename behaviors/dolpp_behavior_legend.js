@@ -72,12 +72,15 @@ Drupal.openlayers.LegendControl = OpenLayers.Class(OpenLayers.Control, {
 
     var style = layer.styleMap.styles.default.defaultStyle;
     //console.dir(style);
-    var s = '<div style="background-color:'
-          + style.fillColor
-          + '; color:'
-          + style.strokeColor
+    var s = 
+          '<div ' + ' style="'
+          + 'background-color:' + style.fillColor
+          //+ '; color:' + style.strokeColor
+          + '; width: 16px; height: 16px'
+          + '; margin-top: 4px'
+          + '; margin-left: 8px'
           + '">'
-          + '<b>Vector layer</b>'
+          + '&nbsp' //<b>- - - -</b>'
           + '</div>';
     return s;
   },
