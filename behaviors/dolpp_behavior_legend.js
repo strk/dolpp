@@ -70,7 +70,7 @@ Drupal.openlayers.LegendControl = OpenLayers.Class(OpenLayers.Control, {
   getVectorLayerLegend: function(layer)
   {
 
-    var style = layer.styleMap.styles.default.defaultStyle;
+    var style = layer.styleMap.styles['default'].defaultStyle;
     //console.dir(style);
     var s = 
           '<div ' + ' style="'
