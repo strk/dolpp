@@ -61,3 +61,40 @@ function dolpp_form_openlayers_ui_layers_form_alter(&$form, &$form_state) {
         );
 
 }
+
+/**
+ * Implementation of hook_block().
+ */
+function dolpp_block($op, $delta = 0) {
+  switch ($op) {
+    case 'list':
+      $blocks = array('dolpplegend' => array('info' => t('OL++ Legend')));
+      return $blocks;
+    case 'view':
+      switch ($delta) {
+        case 'dolpplegend':
+          return array(
+            'subject' => t('Layer legend'),
+            'content' => theme('dolpp_legend')
+          );
+      }
+  }
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function dolpp_theme() {
+    return array(
+        'dolpp_legend' => array(
+        'arguments' => array(),
+        ),
+    );
+}
+
+/*
+ * Implementation of theme function for legend block
+ */
+function theme_dolpp_legend() {
+    return '<div id="dolpp-legend"></div>';
+}

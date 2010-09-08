@@ -39,21 +39,20 @@ class dolpp_behavior_legend extends openlayers_behavior {
       }
     }
 
+
     return array(
       'layers' => array(
         '#title' => t('Layers'),
         '#type' => 'checkboxes',
         '#options' => $supported_layers,
         '#description' => t('Select layers to show legend of. Selecting NO layers will show legend of ALL layers having one.'),
-        '#default_value' => isset($defaults['layers']) ? 
-          $defaults['layers'] : array(),
+        '#default_value' => isset($defaults['layers']) ? $defaults['layers'] : array(),
       ),
       'div' => array(
         '#title' => t('Div'),
         '#type' => 'textfield',
-        '#description' => t('Select id of DIV element to show legend in.'),
-        '#default_value' => isset($defaults['div']) ? 
-          $defaults['div'] : '',
+        '#description' => t('Select id of DIV element to show legend in. If no such div is found, legend will be written just below the map.'),
+        '#default_value' => isset($defaults['div']) ? $defaults['div'] : 'dolpp-legend',
       ),
     );
   }
