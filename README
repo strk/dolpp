@@ -5,6 +5,8 @@ This module contains:
 
  - Legend behavior
  - Query behavior
+ - Dynamic style plugins (needs 'style_plugins' branch of dol-6--2
+   repository on github)
 
 It's a work in progress.
 It is released under the GPL licence.

@@ -98,3 +98,28 @@ function dolpp_theme() {
 function theme_dolpp_legend() {
     return '<div id="dolpp-legend"></div>';
 }
+
+/**
+ * Implementation of hook_ctools_plugin_directory
+ */
+function dolpp_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'openlayers' && $plugin == 'style_plugin') {
+    return 'plugins/style_plugin';
+  }
+}
+
+
+/**
+ * Implementation of hook_ctools_plugin_api().
+ */
+function dolpp_ctools_plugin_api($module, $api) {
+  // Define plugins for OpenLayers plugins api
+  if ($module == "openlayers") {
+    switch ($api) {
+      case 'openlayers_styles':
+        return array('version' => 1);
+
+    }
+  }
+}
+
