@@ -8,7 +8,7 @@
 
 // Define plugin for CTools
 $plugin = array(
-  'title' => t('Cluster population radius'),
+  'title' => t('OL++ Cluster population radius'),
   'description' => t('Style plugin for context styling.
     Sets point radius based on number of features in cluster.'),
   'style_plugin' => array(
@@ -27,9 +27,6 @@ class dolpp_cluster_radius_plugin extends
    */
   function options_init() {
     return array(
-      'context_properties' => array(
-        'pointRadius' => 'getPointRadius',
-      ),
       'feature_weight' => 2,
       'point_radius_min' => 6,
       'point_radius_max' => 12,
@@ -68,15 +65,19 @@ class dolpp_cluster_radius_plugin extends
   }
 
   /**
+   * Get an array of style property callbacks
+   */
+  function get_context_properties() {
+     return array(
+        'pointRadius' => 'getPointRadius',
+     );
+  }
+
+
+  /**
    * Render function
    */
-  function render(&$style) {
-    // For context styling, we want to replace the
-    // style properties with their context value
-    foreach ($this->options['context_properties'] as $prop => $callback) {
-      $style->data[$prop] = '${' . 'dolpp_cluster_radius_plugin_' . $callback . '}';
-    }
-    
+  function render() {
     // Add JS
     drupal_add_js(drupal_get_path('module', 'dolpp') .
       '/plugins/style_plugin/dolpp_cluster_radius_plugin.js');
