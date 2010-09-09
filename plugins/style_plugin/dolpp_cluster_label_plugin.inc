@@ -35,14 +35,6 @@ class dolpp_cluster_label_plugin extends
    */
   function options_form($defaults = array()) {
     $form = array();
-    /* TODO: this is here just to workaround a conceptual bug
-     *       in the style plugin form processor considering
-     *       an empty options array as a sign of the plugin
-     *       not being enabled. FIX upstream !
-     */
-    $form['fake'] = array(
-      '#type' => 'hidden',
-    );
     return $form;
   }
 
