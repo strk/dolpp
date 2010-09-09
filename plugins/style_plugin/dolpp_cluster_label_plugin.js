@@ -19,23 +19,28 @@ Drupal.openlayers.style_plugin.dolpp_cluster_label_plugin = function (params) {
  */
 Drupal.openlayers.style_plugin.dolpp_cluster_label_plugin.prototype = {
 
-  'countFeatures' : function(feature) {
-    if ( feature.cluster ) {
-      var count = 0;
-      var cluster = feature.cluster;
-      var visited = []; 
-      for(var i = 0; i < cluster.length; i++) {
-        if ( typeof cluster[i].drupalFID != 'undefined' ) {
-          var id = cluster[i].drupalFID;
-          if (id in visited) continue;
-          visited[id] = true;
+  // Private methods
+  'prv' : {
+
+    'countFeatures' : function(feature) {
+      if ( feature.cluster ) {
+        var count = 0;
+        var cluster = feature.cluster;
+        var visited = []; 
+        for(var i = 0; i < cluster.length; i++) {
+          if ( typeof cluster[i].drupalFID != 'undefined' ) {
+            var id = cluster[i].drupalFID;
+            if (id in visited) continue;
+            visited[id] = true;
+          }
+          ++count;
         }
-        ++count;
+        return count;
+      } else {
+        return 1;
       }
-      return count;
-    } else {
-      return 1;
     }
+
   },
 
   // Point radius computer.
@@ -43,7 +48,7 @@ Drupal.openlayers.style_plugin.dolpp_cluster_label_plugin.prototype = {
   // limiting the radius between a given min/max range
   'getLabel' : function(feature) {
 
-    var count = this.countFeatures(feature);
+    var count = this.prv.countFeatures(feature);
     return count > 1 ? count : ''; // to string should probably be..
   }
 
