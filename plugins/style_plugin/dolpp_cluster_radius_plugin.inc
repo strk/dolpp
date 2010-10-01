@@ -30,6 +30,7 @@ class dolpp_cluster_radius_plugin extends
       'feature_weight' => 2,
       'point_radius_min' => 6,
       'point_radius_max' => 12,
+      'count_components' => 0,
     );
   }
   
@@ -59,6 +60,12 @@ class dolpp_cluster_radius_plugin extends
       '#description' => t('Weight of each additional feature for the final point radius.'),
       '#default_value' => isset($defaults['feature_weight']) ?
         $defaults['feature_weight'] : 2,
+    );
+    $form['count_components'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Count components, not features'),
+      '#description' => t('If checked, the number of geometry components in a cluster will be counted rather than the number of distinct drupal features (tipically nodes).'),
+      '#default_value' => $defaults['count_components'],
     );
     
     return $form;

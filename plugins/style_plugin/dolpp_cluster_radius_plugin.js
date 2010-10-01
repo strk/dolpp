@@ -54,7 +54,9 @@ Drupal.openlayers.style_plugin.dolpp_cluster_radius_plugin.prototype = {
     var wgt = parseInt(this.params.feature_weight);
 
     var rad = min;
-    var count = this.prv.countFeatures(feature);
+    var count = this.params.count_components ?
+      feature.attributes.count :
+      this.prv.countFeatures(feature);
     if ( count > 1 ) {
        --count;
        // single-feature cluster gets the min value
