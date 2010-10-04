@@ -9,7 +9,7 @@
 /**
  * Legend Behavior
  */
-class dolpp_behavior_select_features extends openlayers_behavior {
+class dolpp_behavior_select_feature extends openlayers_behavior {
   /**
    * Provide initial values for options.
    */
@@ -51,7 +51,7 @@ class dolpp_behavior_select_features extends openlayers_behavior {
    */
   function render(&$map) {
     drupal_add_js(drupal_get_path('module', 'dolpp') .
-      '/behaviors/dolpp_behavior_select_features.js');
+      '/behaviors/dolpp_behavior_select_feature.js');
     return $this->options;
   }
 }
