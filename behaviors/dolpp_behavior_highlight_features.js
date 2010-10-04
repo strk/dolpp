@@ -70,18 +70,16 @@ Drupal.behaviors.dolpp_behavior_highlight_features = function(context) {
 
   var map = data.openlayers;
 
-  // If layers is not defined, then include all vector layers
   var layers = [];
-  if (typeof options.layers == 'undefined' || options.layers.length == 0) {
-    layers = map.getLayersByClass('OpenLayers.Layer.Vector');
-  }
-  else {
-    for (var i in options.layers) {
-      var selectedLayer = map.getLayersBy('drupalID', options.layers[i]);
-      if (typeof selectedLayer[0] != 'undefined') {
-        layers.push(selectedLayer[0]);
-      }
+  for (var i in options.layers) {
+    var selectedLayer = map.getLayersBy('drupalID', options.layers[i]);
+    if (typeof selectedLayer[0] != 'undefined') {
+      layers.push(selectedLayer[0]);
     }
+  }
+  // If no layers were found, include all vector layers
+  if (layers.length == 0) {
+    layers = map.getLayersByClass('OpenLayers.Layer.Vector');
   }
 
   //var control = new OpenLayers.Control.SelectFeature(layers,
