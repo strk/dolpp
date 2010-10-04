@@ -12,14 +12,28 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
    * (possibly clustered)
    */
   'getDrupalFids': function(feature) {
+    var fidcount = 0;
     var fids = [];
-    if ( ! feature.cluster ) fids[feature.drupalFID] = 1;
+    if ( ! feature.cluster ) {
+      if ( feature.drupalFID != undefined ) {
+        if ( ! fids[feature.drupalFID] ) {
+          fids[feature.drupalFID] = 1;
+          ++fidcount;
+        }
+      }
+    }
     else {
       for(var i = 0; i < feature.cluster.length; i++) {
         var pf = feature.cluster[i]; // pseudo-feature
-        fids[pf.drupalFID] = 1;
+        if ( pf.drupalFID != undefined ) {
+          if ( ! fids[feature.drupalFID] ) {
+            fids[pf.drupalFID] = 1;
+            ++fidcount;
+          }
+        }
       }
     }
+    if ( ! fidcount ) return null;
     return fids;
   },
 
@@ -40,6 +54,7 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
     if ( this.selectedFIDS ) return;
 
     this.selectedFIDS = this.getDrupalFids(feature);
+    if ( ! this.selectedFIDS ) return;
 
     var layer = feature.layer;
     for(var i = 0; i < layer.features.length; i++) {
