@@ -29,14 +29,14 @@ function dolpp_openlayers_behaviors() {
         'parent' => 'openlayers_behavior',
       ),
     ),
-    'dolpp_behavior_select_feature' => array(
-      'title' => t('OL++ Feature select'),
-      'description' => t('Adds feature selection.'),
+    'dolpp_behavior_highlight_features' => array(
+      'title' => t('OL++ Features highlighting'),
+      'description' => t('Adds feature highlighting.'),
       'type' => 'layer',
       'path' => drupal_get_path('module', 'dolpp') .'/behaviors',
-      'file' => 'dolpp_behavior_select_feature.inc',
+      'file' => 'dolpp_behavior_highlight_features.inc',
       'behavior' => array(
-        'class' => 'dolpp_behavior_select_feature',
+        'class' => 'dolpp_behavior_highlight_features',
         'parent' => 'openlayers_behavior',
       ),
     ),
