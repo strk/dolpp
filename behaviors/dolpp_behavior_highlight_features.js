@@ -108,6 +108,14 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
               {geometryTypes: this.geometryTypes}
           )
       };
+
+      // HACK: forward all events to next handler 
+      this.handlers['feature'].stopClick = false;
+      this.handlers['feature'].stopDown = false;
+      this.handlers['feature'].stopUp = false;
+      this.handlers['feature'].dblclick = function(evt) {
+        return true;
+      };
   },
 
 
