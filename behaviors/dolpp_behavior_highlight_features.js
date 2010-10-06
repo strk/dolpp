@@ -63,14 +63,13 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
         this.select(pf); // 'highlight' is implemented in base class
       }
     }
-  }
+  },
 
-  , 'onUnselect': function(feature) {
+  'onUnselect': function(feature) {
     if ( ! this.selectedFIDS ) return;
     delete this.selectedFIDS;
     this.unselectAll();
   }
-  , 'hover': true
   //, 'highlightOnly': true
 });
 
@@ -100,7 +99,7 @@ Drupal.behaviors.dolpp_behavior_highlight_features = function(context) {
   //var control = new OpenLayers.Control.SelectFeature(layers,
   var control = new Drupal.dolpp.HighlightFeatures(layers,
     {
-      //, hover: true // TODO: use options for this
+      'hover': !!options.hover 
       //, autoActivate: true
     });
 
