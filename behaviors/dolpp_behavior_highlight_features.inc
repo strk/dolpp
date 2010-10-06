@@ -42,12 +42,6 @@ class dolpp_behavior_highlight_features extends openlayers_behavior {
         '#options' => $supported_layers,
         '#description' => t('Select layers to enable feature selection on. Selecting NO layers will enable ALL supported layers.'),
         '#default_value' => isset($defaults['layers']) ? $defaults['layers'] : array(),
-      ),
-      'hover' => array(
-        '#title' => t('Highlight on hover'),
-        '#type' => 'checkbox',
-        '#description' => t('If checked, features will be highlighted on mouse over, rather than on click'),
-        '#default_value' => isset($defaults['hover']) ? $defaults['hover'] : false
       )
     );
   }
