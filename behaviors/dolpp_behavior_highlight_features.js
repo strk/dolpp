@@ -59,18 +59,22 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
     var layer = feature.layer;
     for(var i = 0; i < layer.features.length; i++) {
       var pf = layer.features[i];
+      if ( pf === feature ) continue; // we know about this already
       if ( this.isSelected(pf) ) {
         this.select(pf); // 'highlight' is implemented in base class
       }
     }
   },
 
-  'onUnselect': function(feature) {
-    if ( ! this.selectedFIDS ) return;
-    delete this.selectedFIDS;
-    this.unselectAll();
-  }
-  //, 'highlightOnly': true
+  initialize: function(options) {
+    OpenLayers.Control.SelectFeature.prototype.initialize.apply(this, [options]);
+
+    // TODO: change something here so that events don't stop but can
+    //       be handled by next tool
+    //this.handlers.feature
+  },
+
+  CLASS_NAME: 'Drupal.dolpp.HighlightFeatures'
 });
 
 
