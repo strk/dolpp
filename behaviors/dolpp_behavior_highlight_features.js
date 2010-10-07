@@ -62,6 +62,12 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
     }
   },
 
+  unhighlight: function(feature) {
+    var style = feature.style || feature.layer.style || "default";
+    var layer = feature.layer;
+    layer.drawFeature(feature, style);
+  },
+
   highlight: function(feature) {
     var style = this.selectStyle || this.renderIntent;
     var layer = feature.layer;
@@ -70,8 +76,6 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
   },
 
   highlightLike: function(sample) {
-
-    this.unhighlightAll();
 
     this.selectedFIDS = this.getDrupalFids(sample);
     if ( ! this.selectedFIDS ) return;
@@ -86,6 +90,40 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
 
   },
 
+  movestart: function() {
+    this.unhighlightAll();
+    this.handlers['feature'].deactivate();
+  },
+
+  moveend: function() {
+    this.handlers['feature'].activate();
+  },
+
+  over: function(feature) {
+    this.highlightLike(feature);
+  },
+
+  out: function(feature) {
+    this.unhighlightAll();
+  },
+
+  deactivate: function () {
+    this.map.events.unregister("movestart", this, this.movestart);
+    this.map.events.unregister("moveend", this, this.moveend);
+    OpenLayers.Control.SelectFeature.prototype.deactivate.apply(this,
+      arguments);
+  },
+
+  activate: function () {
+    OpenLayers.Control.SelectFeature.prototype.activate.apply(this,
+      arguments);
+
+    // For clusters re-computation
+    this.map.events.register("movestart", this, this.movestart);
+    this.map.events.register("moveend", this, this.moveend);
+
+  },
+
   initialize: function(layers, options) {
 
       OpenLayers.Control.prototype.initialize.apply(this, [options]);
@@ -97,8 +135,8 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
       this.initLayer(layers);
 
       var callbacks = {
-          over: this.highlightLike,
-          out: this.unhighlightAll
+          over: this.over,
+          out: this.out
       }
 
       this.callbacks = OpenLayers.Util.extend(callbacks, this.callbacks);
