@@ -12,13 +12,11 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
    * (possibly clustered)
    */
   getDrupalFids: function(feature) {
-    var fidcount = 0;
     var fids = [];
     if ( ! feature.cluster ) {
       if ( feature.drupalFID != undefined ) {
         if ( ! fids[feature.drupalFID] ) {
           fids[feature.drupalFID] = 1;
-          ++fidcount;
         }
       }
     }
@@ -28,22 +26,22 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
         if ( pf.drupalFID != undefined ) {
           if ( ! fids[feature.drupalFID] ) {
             fids[pf.drupalFID] = 1;
-            ++fidcount;
           }
         }
       }
     }
-    if ( ! fidcount ) return null;
     return fids;
   },
 
-  matchesSample: function(candidate) {
+  // @param candidate A feature
+  // @param fids An index of drupalFIDs numbers
+  hasAnyFID: function(candidate, fids) {
     if ( ! candidate.cluster ) {
-      return this.selectedFIDS[candidate.drupalFID] !== undefined;
+      return fids[candidate.drupalFID] !== undefined;
     } else {
       for(var i = 0; i < candidate.cluster.length; i++) {
         var pf = candidate.cluster[i]; // pseudo-feature
-        if ( this.selectedFIDS[pf.drupalFID] !== undefined ) return true;
+        if ( fids[pf.drupalFID] !== undefined ) return true;
       }
       return false;
     }
@@ -75,19 +73,35 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
     layer.selectedFeatures.push(feature);
   },
 
-  highlightLike: function(sample) {
-
-    this.selectedFIDS = this.getDrupalFids(sample);
-    if ( ! this.selectedFIDS ) return;
-
-    var layer = sample.layer;
+  highlightByFIDS: function(layer, fids) {
     for(var i = 0; i < layer.features.length; i++) {
       var candidate = layer.features[i];
-      if ( this.matchesSample(candidate) ) {
+      if ( this.hasAnyFID(candidate, fids) ) {
         this.highlight(candidate);
       }
     }
+  },
 
+  highlightLike: function(sample) {
+
+    var fids = this.getDrupalFids(sample);
+    if ( fids.length == 0 ) {
+      // No drupalFID, we'll highlight this
+      // feature only.
+      highlight(sample);
+      return;
+    }
+
+    // TODO: optionally refuse to highlight 
+    //       multi-fid clusters
+    // if ( theOption && fids.length > 1 );
+
+    var layer = sample.layer;
+    this.highlightByFIDS(layer, fids);
+
+    // Remember for next time
+    layer.selectedFIDS = fids;
+    
   },
 
   movestart: function() {
