@@ -148,12 +148,7 @@ Drupal.behaviors.dolpp_behavior_highlight_features = function(context) {
     layers = map.getLayersByClass('OpenLayers.Layer.Vector');
   }
 
-  //var control = new OpenLayers.Control.SelectFeature(layers,
-  var control = new Drupal.dolpp.HighlightFeatures(layers,
-    {
-      //'hover': !!options.hover 
-      //, autoActivate: true
-    });
+  var control = new Drupal.dolpp.HighlightFeatures(layers);
 
   map.addControl(control);
   control.activate();
