@@ -30,6 +30,7 @@ class dolpp_behavior_legend extends openlayers_behavior {
       $layer = openlayers_layer_load($id);
       if ( ! isset( $layer->data['layer_handler'] ) ) continue;
       if ( $layer->data['layer_handler'] == 'wms'
+                && isset($layer->data['params']['hasLegend'])
                 && $layer->data['params']['hasLegend'] ) {
         $supported_layers[$id] = $name;
       } 

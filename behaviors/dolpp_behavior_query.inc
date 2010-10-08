@@ -34,6 +34,7 @@ class dolpp_behavior_query extends openlayers_behavior {
       }
       elseif ( isset( $layer->data['layer_handler'] )
                 && $layer->data['layer_handler'] == 'wms' 
+                && isset($layer->data['queryable']) 
                 && $layer->data['queryable'] ) {
         $queriable_layers[$id] = $name;
       }
