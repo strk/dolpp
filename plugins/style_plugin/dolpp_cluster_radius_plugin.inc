@@ -65,7 +65,8 @@ class dolpp_cluster_radius_plugin extends
       '#type' => 'checkbox',
       '#title' => t('Count components, not features'),
       '#description' => t('If checked, the number of geometry components in a cluster will be counted rather than the number of distinct drupal features (tipically nodes).'),
-      '#default_value' => $defaults['count_components'],
+      '#default_value' => isset($defaults['count_components']) ?
+        $defaults['count_components'] : 0
     );
     
     return $form;
