@@ -114,10 +114,14 @@ Drupal.dolpp.HighlightFeatures = OpenLayers.Class(OpenLayers.Control.SelectFeatu
   },
 
   over: function(feature) {
+    // workaround weird bug resulting in functions passed here!
+    if ( typeof(feature.CLASS_NAME) !== 'string' ) return;
     this.highlightLike(feature);
   },
 
   out: function(feature) {
+    // workaround weird bug resulting in functions passed here!
+    if ( typeof(feature.CLASS_NAME) !== 'string' ) return;
     this.unhighlightAll();
   },
 
