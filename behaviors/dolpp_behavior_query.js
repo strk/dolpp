@@ -291,6 +291,7 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
         this.unhighlight(feature);
       }
       layer.selectedFeatures = [];
+      layer.selectedFIDS = [];
   },
 
   unhighlightAll: function() {
@@ -346,7 +347,11 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
   },
 
   rehighlightLayer: function(layer) {
-      this.highlightByFIDS(layer, layer.selectedFIDS);
+      var fids = layer.selectedFIDS;
+      this.unhighlightLayer(layer);
+      if ( typeof(fids) !== 'undefined' ) {
+        this.highlightByFIDS(layer, fids);
+      }
   },
 
   rehighlightAll: function() {
@@ -382,6 +387,7 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
         this.highlight(candidate);
       }
     }
+    layer.selectedFIDS = fids;
   },
 
   highlightLike: function(sample) {
@@ -400,10 +406,6 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
 
     var layer = sample.layer;
     this.highlightByFIDS(layer, fids);
-
-    // Remember for next time
-    layer.selectedFIDS = fids;
-    
   },
 
   highlight: function(feature) {
@@ -498,7 +500,7 @@ Drupal.theme.prototype.dolppQueryResultHandler = function(control, map,
       true,
       function (e) {
         map.removePopup(map.queryPopup);
-        control.unhighlightAll();
+        //control.unhighlightAll();
       }
     );
     if ( typeof map.queryPopup != 'undefined' ) {
