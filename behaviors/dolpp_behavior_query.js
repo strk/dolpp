@@ -500,7 +500,7 @@ Drupal.theme.prototype.dolppQueryResultHandler = function(control, map,
       true,
       function (e) {
         map.removePopup(map.queryPopup);
-        //control.unhighlightAll();
+        control.unhighlightAll();
       }
     );
     if ( typeof map.queryPopup != 'undefined' ) {
