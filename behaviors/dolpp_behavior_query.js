@@ -345,6 +345,35 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
     }
   },
 
+  rehighlightLayer: function(layer) {
+      this.highlightByFIDS(layer, layer.selectedFIDS);
+  },
+
+  rehighlightAll: function() {
+    var clayers = this.getCandidateLayers();
+    for (var i=0, len=clayers.length; i<len; ++i) {
+      var layer = clayers[i];
+      if ( layer.CLASS_NAME !== 'OpenLayers.Layer.Vector' ) continue;
+      this.rehighlightLayer(layer);
+    }
+  },
+
+  zoomend: function() {
+    this.rehighlightAll();
+  },
+
+  deactivate: function () {
+    this.map.events.unregister("zoomend", this, this.zoomend);
+    OpenLayers.Control.prototype.deactivate.apply(this,
+      arguments);
+  },
+
+  activate: function() {
+    OpenLayers.Control.prototype.activate.apply(this, arguments);
+
+    // For clusters re-computation
+    this.map.events.register("zoomend", this, this.zoomend);
+  },
 
   highlightByFIDS: function(layer, fids) {
     for(var i = 0; i < layer.features.length; i++) {
