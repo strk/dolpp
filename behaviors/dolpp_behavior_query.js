@@ -164,49 +164,11 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
     this.layerInfo.push({'layer': layer, 'info': info});
 
     if (this.layerInfo.length >= this.queryLayers.length) {
-      this.addPopup();
+      Drupal.theme('dolppQueryResultHandler', this, this.map, this.queryPixel,
+        this.layerInfo);
     } 
 
     // TODO: debug log when getting called past the expected number of times ?
-  },
-
-  addPopup: function() {
-
-    var content = [];
-
-    for (var i=0, len=this.layerInfo.length; i<len; ++i) {
-      var data = this.layerInfo[i];
-      if ( data.info != '') {
-        var info = [];
-        info.push('<div class="openlayers-query openlayers-query-layer">');
-        info.push('<div class="openlayers-query openlayers-query-layer-name">');
-        info.push('<strong>' + data.layer.name + '</strong>');
-        info.push('</div>');
-        info.push(data.info);
-        info.push('</div>');
-        content.push(info.join(''));
-      }
-    }
-
-    var html = content.join('<hr>');
-    if ( html == '' ) html = 'Nothing here';
-
-    var popup = new OpenLayers.Popup.FramedCloud(
-      'popup',
-      this.queryPixel,
-      null,
-      html,
-      null,
-      true,
-      function (e) {
-        this.map.removePopup(this.map.queryPopup);
-      }
-    );
-    if ( typeof this.map.queryPopup != 'undefined' ) {
-      this.map.removePopup(this.map.queryPopup);
-    }
-    this.map.queryPopup = popup;
-    this.map.addPopup(popup);
   },
 
   /* private
@@ -315,7 +277,7 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
       var dist = this.queryPoint.distanceTo(feature.geometry);
       if ( dist <= this.tolerance ) {
         //info.push('Distant: '+dist);
-        info.push(Drupal.theme('openlayersFeatureInfo', feature));
+        info.push(Drupal.theme('dolppFeatureInfo', feature));
         if ( this.doHighlight ) this.highlightLike(feature);
       }
     }
@@ -329,6 +291,15 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
         this.unhighlight(feature);
       }
       layer.selectedFeatures = [];
+  },
+
+  unhighlightAll: function() {
+    var clayers = this.getCandidateLayers();
+    for (var i=0, len=clayers.length; i<len; ++i) {
+      var layer = clayers[i];
+      if ( layer.CLASS_NAME !== 'OpenLayers.Layer.Vector' ) continue;
+      this.unhighlightLayer(layer);
+    }
   },
 
   doHighlight: false, // parametrize!
@@ -424,7 +395,7 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
 /* 
  * Thematic feature info formatter
  */
-Drupal.theme.prototype.openlayersFeatureInfo = function(feature) {
+Drupal.theme.prototype.dolppFeatureInfo = function(feature) {
   var output = '';
   if(feature.cluster)
   {
@@ -453,9 +424,64 @@ Drupal.theme.prototype.openlayersFeatureInfo = function(feature) {
   return output;
 };
 
+/* 
+ * Thematic query result formatter
+ */
+Drupal.theme.prototype.dolppQueryResultFormatter = function(layerInfo)
+{
+
+    var content = [];
+
+    for (var i=0, len=layerInfo.length; i<len; ++i) {
+      var data = layerInfo[i];
+      if ( data.info != '') {
+        var info = [];
+        info.push('<div class="openlayers-query openlayers-query-layer">');
+        info.push('<div class="openlayers-query openlayers-query-layer-name">');
+        info.push('<strong>' + data.layer.name + '</strong>');
+        info.push('</div>');
+        info.push(data.info);
+        info.push('</div>');
+        content.push(info.join(''));
+      }
+    }
+
+    var html = content.join('<hr>');
+    if ( html == '' ) html = 'Nothing here';
+
+    return html;
+}
+
+/* 
+ * Thematic query result presenter
+ */
+Drupal.theme.prototype.dolppQueryResultHandler = function(control, map,
+   queryPixel, layerInfo)
+{
+    var html = Drupal.theme('dolppQueryResultFormatter', layerInfo);
+
+    var popup = new OpenLayers.Popup.FramedCloud(
+      'popup',
+      queryPixel,
+      null,
+      html,
+      null,
+      true,
+      function (e) {
+        map.removePopup(map.queryPopup);
+        control.unhighlightAll();
+      }
+    );
+    if ( typeof map.queryPopup != 'undefined' ) {
+      map.removePopup(map.queryPopup);
+    }
+    map.queryPopup = popup;
+    map.addPopup(popup);
+
+};
+
 /**
  * Behavior for Query 
- * TODO: move away of Drupal.openlayers namespace
  */
 Drupal.behaviors.dolpp_behavior_query = function(context) {
 
