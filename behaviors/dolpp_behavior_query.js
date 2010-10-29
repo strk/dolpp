@@ -125,6 +125,12 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
       // Only query visible layers
       if ( layer.getVisibility() ) {
         var typ = layer.CLASS_NAME.split('.')[2];
+
+        // If highlighting...
+        if ( this.doHighlight && typ === 'Vector' ) {
+          this.unhighlightLayer(layer);
+        }
+
         var meth = 'query'+typ+'Layer';
         if ( typeof this[meth] == 'function' ) {
           this.queryLayers.push({'layer': layer, 'meth': meth});
@@ -310,11 +316,108 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
       if ( dist <= this.tolerance ) {
         //info.push('Distant: '+dist);
         info.push(Drupal.theme('openlayersFeatureInfo', feature));
+        if ( this.doHighlight ) this.highlightLike(feature);
       }
     }
 
     this.addLayerInfo(querylayer, info.join(''));
-  }
+  },
+
+  unhighlightLayer: function(layer) {
+      for(var i=layer.selectedFeatures.length-1; i>=0; --i) {
+        feature = layer.selectedFeatures[i];
+        this.unhighlight(feature);
+      }
+      layer.selectedFeatures = [];
+  },
+
+  doHighlight: false, // parametrize!
+
+  selectStyle: 'select',
+
+  /* Get an index of drupal fids contained in the given feature
+   * (possibly clustered)
+   */
+  getDrupalFids: function(feature) {
+    var fids = [];
+    if ( ! feature.cluster ) {
+      if ( feature.drupalFID != undefined ) {
+        if ( ! fids[feature.drupalFID] ) {
+          fids[feature.drupalFID] = 1;
+        }
+      }
+    }
+    else {
+      for(var i = 0; i < feature.cluster.length; i++) {
+        var pf = feature.cluster[i]; // pseudo-feature
+        if ( pf.drupalFID != undefined ) {
+          if ( ! fids[feature.drupalFID] ) {
+            fids[pf.drupalFID] = 1;
+          }
+        }
+      }
+    }
+    return fids;
+  },
+
+  // @param candidate A feature
+  // @param fids An index of drupalFIDs numbers
+  hasAnyFID: function(candidate, fids) {
+    if ( ! candidate.cluster ) {
+      return fids[candidate.drupalFID] !== undefined;
+    } else {
+      for(var i = 0; i < candidate.cluster.length; i++) {
+        var pf = candidate.cluster[i]; // pseudo-feature
+        if ( fids[pf.drupalFID] !== undefined ) return true;
+      }
+      return false;
+    }
+  },
+
+
+  highlightByFIDS: function(layer, fids) {
+    for(var i = 0; i < layer.features.length; i++) {
+      var candidate = layer.features[i];
+      if ( this.hasAnyFID(candidate, fids) ) {
+        this.highlight(candidate);
+      }
+    }
+  },
+
+  highlightLike: function(sample) {
+
+    var fids = this.getDrupalFids(sample);
+    if ( fids.length == 0 ) {
+      // No drupalFID, we'll highlight this
+      // feature only.
+      highlight(sample);
+      return;
+    }
+
+    // TODO: optionally refuse to highlight 
+    //       multi-fid clusters
+    // if ( theOption && fids.length > 1 );
+
+    var layer = sample.layer;
+    this.highlightByFIDS(layer, fids);
+
+    // Remember for next time
+    layer.selectedFIDS = fids;
+    
+  },
+
+  highlight: function(feature) {
+    var style = this.selectStyle || this.renderIntent;
+    var layer = feature.layer;
+    layer.drawFeature(feature, style);
+    layer.selectedFeatures.push(feature);
+  },
+
+  unhighlight: function(feature) {
+    var style = feature.style || feature.layer.style || 'default';
+    var layer = feature.layer;
+    layer.drawFeature(feature, style);
+  },
 
 });
 
@@ -362,7 +465,7 @@ Drupal.behaviors.dolpp_behavior_query = function(context) {
     var options = data.map.behaviors['dolpp_behavior_query'];
 
     var qlayers = [];
-    for (var i in options.layers) {
+    for (var i=0; i<options.layers.length; i++) {
       var layer_id = options.layers[i];
       if ( layer_id !== 0 ) qlayers.push(layer_id);
     }
@@ -372,6 +475,7 @@ Drupal.behaviors.dolpp_behavior_query = function(context) {
       qlayers: qlayers,
       radius: parseInt(options.radius, 10),
       timeout: parseInt(options.timeout, 10),
+      doHighlight: !!options.highlight,
       autoActivate: true
     });
 

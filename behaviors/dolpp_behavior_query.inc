@@ -61,7 +61,14 @@ class dolpp_behavior_query extends openlayers_behavior {
         '#type' => 'textfield',
         '#default_value' => (isset($defaults['timeout'])) ?
           $defaults['timeout'] : 1000,
-        '#description' => t('Timeout for WMS layer queries, in milliseconds'),
+        '#description' => t('Timeout for WMS layer queries, in milliseconds.'),
+      ),
+      'highlight' => array(
+        '#title' => t('Highlight selected'),
+        '#type' => 'checkbox',
+        '#default_value' => (isset($defaults['highlight'])) ?
+          $defaults['highlight'] : 0,
+        '#description' => t('Highlight vector features hit by the query.'),
       ),
     );
   }
