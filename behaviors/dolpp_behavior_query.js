@@ -5,11 +5,14 @@
  * Query Behavior
  */
 
+Drupal.dolpp = Drupal.dolpp || {};
+
 /*
- * OpenLayers Query Control class
- * TODO: move out of Drupal.openlayers namespace
+ * Drupal OpenLayers Plus Plus Query Control class
  */
-Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
+Drupal.dolpp.QueryControl = OpenLayers.Class(OpenLayers.Control, {
+
+  CLASS_NAME: 'Drupal.dolpp.QueryControl',
 
   defaultHandlerOptions: {
     'single': true,
@@ -527,7 +530,7 @@ Drupal.behaviors.dolpp_behavior_query = function(context) {
       if ( layer_id !== 0 ) qlayers.push(layer_id);
     }
 
-    var queryControl = new Drupal.openlayers.QueryControl({
+    var queryControl = new Drupal.dolpp.QueryControl({
       qlayers_id_field: 'drupalID',
       qlayers: qlayers,
       radius: parseInt(options.radius, 10),
