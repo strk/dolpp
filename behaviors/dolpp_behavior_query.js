@@ -419,7 +419,7 @@ Drupal.openlayers.QueryControl = OpenLayers.Class(OpenLayers.Control, {
     var style = feature.style || feature.layer.style || 'default';
     var layer = feature.layer;
     layer.drawFeature(feature, style);
-  },
+  }
 
 });
 
