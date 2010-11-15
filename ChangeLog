@@ -1,0 +1,269 @@
+2010-11-08  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_query.js: Put QueryControl under 'dolpp'
+	namespace (from 'openlayers')
+
+2010-11-08  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_query.js: Drop spurious comma at the end
+	of array
+
+2010-10-29  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_query.js: The default query result
+	presenter is a popup which deselects on close
+
+2010-10-29  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_query.js: Make highlighted 'fids' sticky
+
+2010-10-29  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_query.js: Maintain last-queried features
+	highlighted
+
+2010-10-29  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_query.js: Refactor to allow for
+	installing callbacks to  handle query results
+
+2010-10-29  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_query.inc,
+	behaviors/dolpp_behavior_query.js: Add option to do highlighting on
+	query (for vector layers only)
+
+2010-10-28  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.js: Workaround to DOL
+	bug isn't needed anymore
+
+2010-10-27  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.js: feature highlight
+	behavior: workaround weird bug resulting in functions passed to
+	feature selection callback functions when using geoext
+
+2010-10-08  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_legend.inc,
+	behaviors/dolpp_behavior_query.inc: more undefined indices
+
+2010-10-08  Sandro Santilli <strk@keybit.net>
+
+	* plugins/style_plugin/dolpp_cluster_radius_plugin.inc: Fix
+	reference to unexistant array index
+
+2010-10-07  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.js: More functions
+	splitting
+
+2010-10-07  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.js: Unhighlight all at
+	start of move and disable more events, re-enable by the end of move
+
+2010-10-07  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.js: remove unused code
+
+2010-10-06  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.js: Don't stop events
+	propagation (click, up, down, doubleclick)
+
+2010-10-06  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.inc,
+	behaviors/dolpp_behavior_highlight_features.js: Drop the 'hover'
+	option, we'll always act on hover. Avoid invoking all callbacks
+	(basically copy lots from the SelectFeature into local code)
+
+2010-10-06  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.js: Do not select
+	initially-clicked feature twice. No need to handle onUnselect
+
+2010-10-06  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.inc,
+	behaviors/dolpp_behavior_highlight_features.js: Features highlight
+	behavior now lets you specify if you want to highlight on click or
+	hover (should really allow a mouse_down to highlight and mouse_up to
+	unhighlight)
+
+2010-10-05  Sandro Santilli <strk@keybit.net>
+
+	* README: Add link to required dol-6--2 branch
+
+2010-10-04  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.js: Do not choke with
+	layers having no drupalFID
+
+2010-10-04  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.js: checkboxes arrive
+	as weird objects, fix check for selection presence
+
+2010-10-04  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_highlight_features.inc,
+	behaviors/dolpp_behavior_highlight_features.js,
+	behaviors/dolpp_behavior_select_feature.inc,
+	behaviors/dolpp_behavior_select_feature.js, dolpp.module: Rename the
+	behavior once again to 'highlight features'
+
+2010-10-04  Sandro Santilli <strk@keybit.net>
+
+	* dolpp.module: Fix path to select_feature control
+
+2010-10-04  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_select_feature.inc,
+	behaviors/dolpp_behavior_select_feature.js,
+	behaviors/dolpp_behavior_select_features.inc,
+	behaviors/dolpp_behavior_select_features.js: Renamed control to
+	select_feature (to match OL thingy)
+
+2010-10-01  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_select_features.inc,
+	behaviors/dolpp_behavior_select_features.js, dolpp.module: Stub
+	select features behavior
+
+2010-10-01  Sandro Santilli <strk@keybit.net>
+
+	* plugins/style_plugin/dolpp_cluster_radius_plugin.inc,
+	plugins/style_plugin/dolpp_cluster_radius_plugin.js: Allow cluster
+	radius plugin to count components rather than features
+
+2010-09-29  Sandro Santilli <strk@keybit.net>
+
+	*
+	plugins/style_plugin/dolpp_cluster_safe_attribute_label_plugin.inc,
+	plugins/style_plugin/dolpp_cluster_safe_attribute_label_plugin.js: 
+	Add cluster-safe attribute label plugin
+
+2010-09-09  Sandro Santilli <strk@keybit.net>
+
+	* plugins/style_plugin/dolpp_cluster_label_plugin.inc: Bug fixed
+	upstream, no need to return fake options for plugin
+
+2010-09-09  Sandro Santilli <strk@keybit.net>
+
+	* plugins/style_plugin/dolpp_cluster_label_plugin.js,
+	plugins/style_plugin/dolpp_cluster_radius_plugin.js: Hide private
+	methods of style plugin classes so they don't fall in styleMap
+	context
+
+2010-09-09  Sandro Santilli <strk@keybit.net>
+
+	* plugins/style_plugin/dolpp_cluster_label_plugin.inc,
+	plugins/style_plugin/dolpp_cluster_radius_plugin.inc: Adapt style
+	plugin to new API in dol staging branch
+
+2010-09-08  Sandro Santilli <strk@keybit.net>
+
+	* README, dolpp.module,
+	plugins/style_plugin/dolpp_cluster_label_plugin.inc,
+	plugins/style_plugin/dolpp_cluster_label_plugin.js,
+	plugins/style_plugin/dolpp_cluster_radius_plugin.inc,
+	plugins/style_plugin/dolpp_cluster_radius_plugin.js: Add dynamic
+	style plugins
+
+2010-09-08  Marco Giacomassi <marco.giacomassi@ext.jrc.it>
+
+	* : added legend system block
+
+2010-09-08  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_legend.js: 'default' seems to be a
+	reserved keyword, both IE8 and chrome don't like it much
+
+2010-09-07  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_legend.js: Reduce div size for vector
+	layer symbol
+
+2010-09-07  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_legend.js: forgot to close the B tag
+
+2010-09-07  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_legend.inc,
+	behaviors/dolpp_behavior_legend.js: Add support for vector layers in
+	behavior form too (PHP)
+
+2010-09-07  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_legend.js: Naive vector legend
+
+2010-09-07  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_legend.inc,
+	behaviors/dolpp_behavior_legend.js: Allow specifying an output div
+	for the legend
+
+2010-09-06  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_query.js: Handle XmlHttpRequest.status ==
+	0, which seems to happen on cross-origin violations with W3C cors
+	implementing firefox (3.5+)
+
+2010-09-03  Sandro Santilli <strk@keybit.net>
+
+	* README: Licence update (really still testing git submodules)
+
+2010-09-01  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_legend.js: Back to legend construction
+	built into the behavior, till I find a less intrusive way to have
+	this provided by layer types
+
+2010-09-01  Sandro Santilli <strk@keybit.net>
+
+	* .vimrc: vi style
+
+2010-09-01  Sandro Santilli <strk@keybit.net>
+
+	* dolpp.module: Add legend indicator for wms layers
+
+2010-09-01  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_legend.inc: Fix access to hasLegend
+
+2010-09-01  Sandro Santilli <strk@keybit.net>
+
+	* README: Add PD license
+
+2010-09-01  Sandro Santilli <strk@keybit.net>
+
+	* README: Tab to spaces (still playing with git submodules)
+
+2010-09-01  Sandro Santilli <strk@keybit.net>
+
+	* README: Add title to readme (another test really)
+
+2010-09-01  Sandro Santilli <strk@keybit.net>
+
+	* README: Readme (more a test that anything else)
+
+2010-09-01  Sandro Santilli <strk@keybit.net>
+
+	* dolpp.module: Remove debugging calls
+
+2010-09-01  Sandro Santilli <strk@keybit.net>
+
+	* behaviors/dolpp_behavior_query.js: Fix behavior name
+
+2010-09-01  Sandro Santilli <strk@keybit.net>
+
+	* dolpp.module: Alter WMS layer form to add a 'queryable' parameter
+
+2010-08-31  Sandro Santilli <strk@keybit.net>
+
+	* first commit
+
