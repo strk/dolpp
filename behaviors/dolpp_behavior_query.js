@@ -371,6 +371,7 @@ Drupal.dolpp.QueryControl = OpenLayers.Class(OpenLayers.Control, {
   },
 
   deactivate: function () {
+    this.unhighlightAll();
     this.map.events.unregister("zoomend", this, this.zoomend);
     OpenLayers.Control.prototype.deactivate.apply(this,
       arguments);
