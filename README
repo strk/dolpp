@@ -8,5 +8,6 @@ This module contains:
  - Query behavior
  - Dynamic style plugins 
 
-It's a work in progress.
-It is released under the GPL3 licence (see COPYING)
+
+Copyright (C) 2010 Sandro Santilli <strk@keybit.net>
+Released under the GPL3 licence (see COPYING)
