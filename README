@@ -1,12 +1,12 @@
 OpenLayers Plus Plus  - Drupal module
 -------------------------------------
+http://github.com/strk/dolpp
 
 This module contains:
 
  - Legend behavior
  - Query behavior
- - Dynamic style plugins (needs 'style_plugins' branch of dol-6--2
-   repository on github: http://github.com/strk/dol-6--2/tree/style_plugins)
+ - Dynamic style plugins 
 
 It's a work in progress.
-It is released under the GPL licence.
+It is released under the GPL3 licence (see COPYING)
