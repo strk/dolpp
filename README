@@ -8,6 +8,10 @@ This module contains:
  - Query behavior
  - Dynamic style plugins 
 
+NOTE: You'll need a version of the Drupal OpenLayers module
+     _LATER_THAN_ 6.x-2.0-alpha10 for the dynamic style plugins
+     to work
+
 
 Copyright (C) 2010 Sandro Santilli <strk@keybit.net>
 Released under the GPL3 licence (see COPYING)
